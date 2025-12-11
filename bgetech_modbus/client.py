@@ -1,5 +1,5 @@
 import time
-from typing import List
+from typing import List, Union
 
 from pymodbus.client import AsyncModbusTcpClient
 
@@ -94,6 +94,7 @@ class BGEtechClient:
         return optimized_groups
 
     async def read_data(self, register: list[ModbusRegister]):
+        conv: Union[str, int, float]
         output = []
         for group in self._optimize_reg_list(register):
             start_address = group[0].address
