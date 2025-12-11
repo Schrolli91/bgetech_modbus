@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bgetch-modbus"
-version = "0.1.0"
+version = "0.1.1"
 description = "Asynchronous Modbus library for B+G e-tech energy meters."
 readme = "README.md"    
 license = {file = "LICENSE"}
