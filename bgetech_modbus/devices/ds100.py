@@ -2,6 +2,25 @@ from . import DataType, ModbusRegister
 
 
 class DS100:
+    serial_number = ModbusRegister(
+        name="Serial Number",
+        address=0x1000,
+        count=3,
+        data_type=DataType.UINT16,
+    )
+    sw_rev = ModbusRegister(
+        name="Software Revision",
+        address=0x1004,
+        count=1,
+        data_type=DataType.UINT16,
+    )
+    hw_rev = ModbusRegister(
+        name="Hardware Revision",
+        address=0x1005,
+        count=1,
+        data_type=DataType.UINT16,
+    )
+
     voltage_l1_n = ModbusRegister(
         name="Voltage L1/N",
         address=0x0400,
