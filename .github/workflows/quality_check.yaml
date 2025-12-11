@@ -30,6 +30,8 @@ jobs:
           pip install pytest pytest-cov pytest-asyncio ruff mypy bandit
           # Install the project itself (replace with your actual installation command)
           pip install -r requirements.txt
+          ä Install local lib
+          pip install -e .
 
       # --- 1. Pytest and Coverage ---
       - name: Run Tests and Check Coverage
