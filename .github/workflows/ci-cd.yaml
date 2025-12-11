@@ -10,7 +10,7 @@ on:
     branches: [ "main" ]
 
 jobs:
- build_test:
+  build_test:
     name: Test and Build Artifacts
     runs-on: ubuntu-latest
     
