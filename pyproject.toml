@@ -3,7 +3,7 @@ requires = ["setuptools >= 77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "bgetch-modbus"
+name = "bgetech-modbus"
 version = "0.1.1"
 description = "Asynchronous Modbus library for B+G e-tech energy meters."
 readme = "README.md"    
