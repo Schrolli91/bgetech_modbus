@@ -6,7 +6,7 @@ class DS100:
         name="Serial Number",
         address=0x1000,
         count=3,
-        data_type=DataType.UINT16,
+        data_type=DataType.BCD,
     )
     sw_rev = ModbusRegister(
         name="Software Revision",

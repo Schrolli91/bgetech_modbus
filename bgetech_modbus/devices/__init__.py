@@ -9,6 +9,7 @@ class DataType(Enum):
     UINT32 = "UINT32"
     FLOAT32 = "FLOAT32"
     FLOAT64 = "FLOAT64"
+    BCD = "BCD"
 
 
 @dataclass

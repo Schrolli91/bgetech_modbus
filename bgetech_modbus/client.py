@@ -105,11 +105,18 @@ class BGEtechClient:
                 slice_end = slice_start + reg.count
                 sliced_data = raw_data[slice_start:slice_end]
 
-                conv = await self._convert_register(
-                    sliced_data,
-                    data_type=reg.data_type,
-                    scale=reg.scale,
-                )
+                if reg.data_type is DataType.BCD:
+                    conv = ""
+                    for reg_value in sliced_data:
+                        hex_string = f"{reg_value:04x}"
+                        conv += hex_string
+                    conv = conv[: len(sliced_data) * 4]
+                else:
+                    conv = await self._convert_register(
+                        sliced_data,
+                        data_type=reg.data_type,
+                        scale=reg.scale,
+                    )
 
                 reg.value = conv
                 reg.last_received = int(time.time())
