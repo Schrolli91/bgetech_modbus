@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bgetech-modbus"
-version = "0.1.0-beta"
+version = "0.1.0b1"
 description = "Asynchronous Modbus library for B+G e-tech energy meters."
-readme = "README.md"    
+readme = "README.md"
 license = {file = "LICENSE"}
 authors = [
     {name = "Bastian Schroll", email = "info@schroll-it.de"},
@@ -27,7 +27,7 @@ classifiers = [
     "Intended Audience :: Developers",
 ]
 dependencies = [
-    "pymodbus>=3.11.4",
+    "pymodbus>=3.11.2",
 ]
 
 [project.urls]
