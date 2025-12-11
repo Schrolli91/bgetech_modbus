@@ -37,7 +37,7 @@ class DS100:
     )
     current_l2 = ModbusRegister(
         name="Current L2",
-        address=0x0410,
+        address=0x0412,
         count=2,
         data_type=DataType.INT32,
         scale=0.001,
@@ -45,7 +45,7 @@ class DS100:
     )
     current_l3 = ModbusRegister(
         name="Current L3",
-        address=0x0410,
+        address=0x0413,
         count=2,
         data_type=DataType.INT32,
         scale=0.001,
