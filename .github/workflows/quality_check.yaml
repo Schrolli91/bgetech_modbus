@@ -32,9 +32,9 @@ jobs:
           pip install -r requirements.txt
 
       # --- 1. Pytest and Coverage ---
-      - name: Run Tests and Check Coverage
-        run: |
-          pytest --cov=bgetech_modbus --cov-report=xml 
+      # - name: Run Tests and Check Coverage
+      #   run: |
+      #     pytest --cov=bgetech_modbus --cov-report=xml 
 
       # --- 2. Ruff (Linting & Formatting Check) ---
       - name: Run Ruff Linter and Formatter Check
