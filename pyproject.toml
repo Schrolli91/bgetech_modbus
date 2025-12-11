@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bgetch-modbus"
+version = "0.1.0"
+description = "Asynchronous Modbus library for B+G e-tech energy meters."
+readme = "README.md"    
+license = {file = "LICENSE"}
+authors = [
+    {name = "Bastian Schroll", email = "info@schroll-it.de"},
+]
+maintainers = [
+    {name = "Bastian Schroll", email = "info@schroll-it.de"},
+]
+keywords = ["modbus", "homeassistant", "energy", "b+g e-tech"]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+]
+python-requires = ">=3.10"
+dependencies = [
+    "pymodbus>=3.11.4",
+]
+
+[project.urls]
+Homepage = "https://github.com/Schrolli91/bgetech_modbus/"
+Issues = "https://github.com/Schrolli91/bgetech_modbus/issues"
