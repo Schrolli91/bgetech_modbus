@@ -136,8 +136,10 @@ jobs:
         if: env.VERSION_CHANGE == 'true'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          password: ${{ secrets.PYPI_API_TOKEN }} 
-          
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
+          packages_dir: dist
+
       - name: Create Git Tag
         # Only create tag if upload was successful (or if we skipped the upload, but we want the tag later)
         # Using the output variable from the version check step
