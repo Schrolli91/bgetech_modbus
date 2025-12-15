@@ -15,6 +15,7 @@ jobs:
   # 1. Test, Lint, and Build Job (Runs for all matrix versions)
   # ----------------------------------------------------
   test_and_build:
+    name: "Test, Lint, and Build"
     runs-on: ubuntu-latest
     
     # Define the matrix for multi-version testing
@@ -81,6 +82,7 @@ jobs:
   # 2. PyPI Publish Job
   # ----------------------------------------------------
   publish_pypi:
+    name: "Publish to PyPI"
     needs: test_and_build
     # Only run on push to main and if all tests passed
     if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -158,6 +160,7 @@ jobs:
   # 3. GitHub Release Job
   # ----------------------------------------------------
   create_release:
+    name: "Create GitHub Release"
     needs: publish_pypi
     # Only run if publish_pypi was successfully initiated (i.e. version changed)
     # This relies on the environment variable set in the previous job
@@ -178,23 +181,37 @@ jobs:
           TAG=$(git describe --tags --abbrev=0)
           echo "NEW_TAG_VAR=$TAG" >> $GITHUB_ENV
 
-      - name: Generate Changelog (Simulating GitHub UI functionality)
-        id: changelog
-        if: env.NEW_TAG_VAR # Only if a tag was found
-        # 💡 This is the best community action to simulate the "Generate release notes" button
-        uses: "amannn/action-generate-release-notes@v1" 
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          template: default.hbs 
+      - name: Get Tag Name and Check Prerelease Status
+        id: tag_check
+        run: |
+          # Den aktuellsten Tag abrufen, der gerade von Job 2 erstellt wurde
+          TAG=$(git describe --tags --abbrev=0 2>/dev/null)
           
+          # Sicherstellen, dass ein Tag existiert
+          if [ -z "$TAG" ]; then
+            echo "NEW_TAG_VAR=" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          VERSION=${TAG#v} # Führendes 'v' entfernen
+          
+          # Prüfen, ob die Version 'b' (beta) oder 'rc' (release candidate) enthält
+          if [[ "$VERSION" =~ (b|rc) ]]; then
+            IS_PRERELEASE=true
+          else
+            IS_PRERELEASE=false
+          fi
+          
+          echo "NEW_TAG_VAR=$TAG" >> $GITHUB_OUTPUT
+          echo "IS_PRERELEASE=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+
       - name: Create GitHub Release
-        if: env.NEW_TAG_VAR # Only if a tag was found
-        # 💡 The softprops action is the most versatile for creating the release with a custom body
-        uses: softprops/action-gh-release@v2 
+        if: steps.tag_check.outputs.NEW_TAG_VAR
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ env.NEW_TAG_VAR }}
-          name: Release ${{ env.NEW_TAG_VAR }}
-          body: ${{ steps.changelog.outputs.body }} # Passing the generated notes here
+          generate_release_notes: true 
+          
+          tag_name: ${{ steps.tag_check.outputs.NEW_TAG_VAR }}
+          name: Release ${{ steps.tag_check.outputs.NEW_TAG_VAR }}
           draft: false
-          prerelease: false
+          prerelease: ${{ steps.tag_check.outputs.IS_PRERELEASE }}
