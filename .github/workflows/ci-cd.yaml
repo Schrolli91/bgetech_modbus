@@ -10,6 +10,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   # ----------------------------------------------------
   # 1. Test, Lint, and Build Job (Runs for all matrix versions)
