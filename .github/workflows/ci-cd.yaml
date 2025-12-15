@@ -189,10 +189,10 @@ jobs:
       - name: Get Tag Name and Check Prerelease Status
         id: tag_check
         run: |
-          # Den aktuellsten Tag abrufen, der gerade von Job 2 erstellt wurde
+          # Get current tag name
           TAG=$(git describe --tags --abbrev=0 2>/dev/null)
           
-          # Sicherstellen, dass ein Tag existiert
+          # Check if there is an tag name available
           if [ -z "$TAG" ]; then
             echo "NEW_TAG_VAR=" >> $GITHUB_OUTPUT
             exit 0
@@ -200,7 +200,7 @@ jobs:
           
           VERSION=${TAG#v} # Führendes 'v' entfernen
           
-          # Prüfen, ob die Version 'b' (beta) oder 'rc' (release candidate) enthält
+          # check version for beta or release candidate state
           if [[ "$VERSION" =~ (b|rc) ]]; then
             IS_PRERELEASE=true
           else
