@@ -169,7 +169,7 @@ jobs:
     needs: publish_pypi
     # Only run if publish_pypi was successfully initiated (i.e. version changed)
     # This relies on the environment variable set in the previous job
-    if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.ref_name == 'main'
+    if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     
     steps:
