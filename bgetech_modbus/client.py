@@ -103,7 +103,7 @@ class BGEtechClient:
 
     async def read_data(self, register: list[ModbusRegister]):
         conv: Union[str, int, float]
-        output = []
+        output: List = []
         if not register:
             return output
         for group in self._optimize_reg_list(register):
