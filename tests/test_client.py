@@ -3,7 +3,7 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from bgetech_modbus.client import BGEtechClient
 from bgetech_modbus.exceptions import CannotConnect
-from bgetech_modbus.devices import DataType
+from bgetech_modbus.devices import DataType, DS100
 
 
 class DummyRegister:
@@ -177,6 +177,17 @@ async def test_read_data(client):
     for r in regs:
         r.data_type = None
         r.scale = 1.0
+    out = await client.read_data(regs)
+    assert len(out) == 2
+    assert out[0].value == 10
+    assert out[1].value == 20
+
+
+@pytest.mark.asyncio
+async def test_read_data_ds100(client):
+    client._read_holding_registers = AsyncMock(return_value=[1, 2, 3, 4])
+    client._convert_register = AsyncMock(side_effect=[10, 20])
+    regs = [DS100.active_energy_import, DS100.active_energy_export]
     out = await client.read_data(regs)
     assert len(out) == 2
     assert out[0].value == 10

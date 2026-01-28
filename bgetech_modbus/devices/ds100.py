@@ -1,7 +1,8 @@
-from . import DataType, ModbusRegister
+from bgetech_modbus.devices.base import BaseDevice
+from bgetech_modbus.devices import DataType, ModbusRegister
 
 
-class DS100:
+class DS100(BaseDevice):
     serial_number = ModbusRegister(
         name="Serial Number",
         address=0x1000,

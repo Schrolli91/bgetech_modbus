@@ -16,23 +16,39 @@ In general there are only a few simple steps:
 import asyncio
 
 from bgetech_modbus.client import BGEtechClient
-from bgetech_modbus.devices.ds100 import DS100
+from bgetech_modbus.devices import DS100, PM100
 
 
 async def main():
-    client = BGEtechClient(host="127.0.0.1", port=502, device_id=1)
-    await client.connect()
+    # DS100 Client
+    client_ds100 = BGEtechClient(host="127.0.0.1", port=502, device_id=1)
+    await client_ds100.connect()
 
-    config = [DS100.active_energy_import, DS100.active_energy_export]
-    data = await client.read_data(config)
+    config_ds100 = [DS100.active_energy_import, DS100.active_energy_export]
+    data_ds100 = await client_ds100.read_data(config_ds100)
 
-    for entry in data:
+    for entry in data_ds100:
         print(f"{entry.name}: {entry.value} {entry.unit}")
         print(f"Last received: {entry.last_received}")
         print(f"[{entry.address}, {entry.count}, {entry.data_type.value}]")
         print()
 
-    client.close()
+    client_ds100.close()
+
+    # PM100 Client (example with different device_id)
+    client_pm100 = BGEtechClient(host="127.0.0.1", port=502, device_id=2)
+    await client_pm100.connect()
+
+    config_pm100 = [PM100.active_energy_import, PM100.power_factor]
+    data_pm100 = await client_pm100.read_data(config_pm100)
+
+    for entry in data_pm100:
+        print(f"{entry.name}: {entry.value} {entry.unit}")
+        print(f"Last received: {entry.last_received}")
+        print(f"[{entry.address}, {entry.count}, {entry.data_type.value}]")
+        print()
+
+    client_pm100.close()
 
 
 if __name__ == "__main__":
@@ -46,3 +62,23 @@ if __name__ == "__main__":
 VS Code or any other IDE will show you the possible values that can be retrieved:
 
 ![](docs/editor.png)
+
+## Adding a New Device
+
+To add support for a new device:
+
+1. Copy `bgetech_modbus/devices/template.py` to `bgetech_modbus/devices/<your_device>.py`
+2. Rename the class to match your device (e.g., `class MyDevice:`)
+3. Adjust register addresses, scales, and units as needed
+4. Add your device to `bgetech_modbus/devices/__init__.py`:
+   ```python
+   from .<your_device> import MyDevice
+   __all__.append('MyDevice')
+   ```
+5. Import and use in your code:
+   ```python
+   from bgetech_modbus.devices import MyDevice
+   config = [MyDevice.active_energy_import, MyDevice.voltage_l1_n]
+   ```
+
+See `bgetech_modbus/devices/pm100.py` for an example implementation.
