@@ -3,6 +3,7 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from bgetech_modbus.client import BGEtechClient
 from bgetech_modbus.exceptions import CannotConnect
+from bgetech_modbus.devices import DataType
 
 
 class DummyRegister:
@@ -116,6 +117,48 @@ async def test_convert_register_list(client):
     client._get_datatype = MagicMock(return_value=1)
     result = await client._convert_register([1, 2], data_type=None, scale=2.0)
     assert result == 6.0
+
+
+@pytest.mark.asyncio
+async def test_convert_register_value_error(client):
+    client.client.convert_from_registers = MagicMock(
+        side_effect=ValueError("Invalid data")
+    )
+    client.client.DATATYPE = MagicMock(INT16=1)
+    client._get_datatype = MagicMock(return_value=1)
+    with pytest.raises(ValueError, match="Invalid register data: Invalid data"):
+        await client._convert_register([1, 2], data_type=None, scale=1.0)
+
+
+@pytest.mark.asyncio
+async def test_get_datatype(client):
+    client.client.DATATYPE = MagicMock(
+        INT16=1, INT32=2, UINT16=3, UINT32=4, FLOAT32=5, FLOAT64=6
+    )
+    assert client._get_datatype(DataType.INT16) == 1
+    assert client._get_datatype(DataType.INT32) == 2
+    assert client._get_datatype(DataType.UINT16) == 3
+    assert client._get_datatype(DataType.UINT32) == 4
+    assert client._get_datatype(DataType.FLOAT32) == 5
+    assert client._get_datatype(DataType.FLOAT64) == 6
+    with pytest.raises(ValueError, match="Invalid data type: DataType.UNKNOWN"):
+        client._get_datatype(DataType.UNKNOWN)
+
+
+@pytest.mark.asyncio
+async def test_read_data_bcd(client):
+    client._read_holding_registers = AsyncMock(return_value=[0x1234, 0x5678])
+    regs = [DummyRegister(1, count=2, data_type=DataType.BCD, scale=1.0)]
+    out = await client.read_data(regs)
+    assert len(out) == 1
+    assert out[0].value == "12345678"
+
+
+@pytest.mark.asyncio
+async def test_read_data_empty_register_list(client):
+    regs = []
+    out = await client.read_data(regs)
+    assert len(out) == 0
 
 
 def test_optimize_reg_list(client):

@@ -15,9 +15,12 @@ class BGEtechClient:
         self.client = AsyncModbusTcpClient(host=self.host, port=self.port)
 
     async def connect(self):
-        await self.client.connect()
-        if not self.client.connected:
-            raise CannotConnect(f"Cannot connect to {self.host}:{self.port}")
+        try:
+            await self.client.connect()
+            if not self.client.connected:
+                raise CannotConnect(f"Cannot connect to {self.host}:{self.port}")
+        except Exception as e:
+            raise CannotConnect(f"Cannot connect to {self.host}:{self.port}: {e}")
 
     def close(self):
         if self.client and self.client.connected:
@@ -26,6 +29,8 @@ class BGEtechClient:
     async def _read_holding_registers(self, address: int, count: int):
         if not self.client or not self.client.connected:
             await self.connect()
+        if not self.client:
+            raise CannotConnect(f"Client not initialized for {self.host}:{self.port}")
         result = await self.client.read_holding_registers(
             address=address, count=count, device_id=self.device_id
         )
@@ -34,14 +39,17 @@ class BGEtechClient:
     async def _convert_register(
         self, registers, data_type: DataType, scale: float = 1.0
     ) -> float | str:
-        value = self.client.convert_from_registers(
-            registers=registers, data_type=self._get_datatype(data_type)
-        )
-        if isinstance(value, str):
-            return value
-        if isinstance(value, list):
-            value = value[0]
-        return value * scale
+        try:
+            value = self.client.convert_from_registers(
+                registers=registers, data_type=self._get_datatype(data_type)
+            )
+            if isinstance(value, str):
+                return value
+            if isinstance(value, list):
+                value = value[0]
+            return value * scale
+        except ValueError as e:
+            raise ValueError(f"Invalid register data: {e}")
 
     def _get_datatype(self, data_type: DataType) -> AsyncModbusTcpClient.DATATYPE:
         if data_type == DataType.INT16:
@@ -96,6 +104,8 @@ class BGEtechClient:
     async def read_data(self, register: list[ModbusRegister]):
         conv: Union[str, int, float]
         output = []
+        if not register:
+            return output
         for group in self._optimize_reg_list(register):
             start_address = group[0].address
             read_length = group[-1].address + group[-1].count - start_address
